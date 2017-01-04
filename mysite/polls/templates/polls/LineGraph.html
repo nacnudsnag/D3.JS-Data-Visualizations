@@ -1,0 +1,284 @@
+<!DOCTYPE html">
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Home</title>
+	<!-- CSS Style Sheets -->
+	{% load static %}
+	<link rel='stylesheet' type='text/css' href='{% static 'website/css/skeleton.css' %}'/>
+	<link rel='stylesheet' type='text/css' href='{% static 'website/css/custom.css' %}'/>
+	<!-- Adding d3.js -->
+	<script type="text/javascript" src="{% static 'website/d3/d3.js'%}"></script>
+	<style>
+	.svg-container {
+	    display: inline-block;
+	    position: relative;
+	    margin-left: -.6em;
+	    width: 105%;
+	    padding-bottom: 60%; /* aspect ratio */
+	    vertical-align: top;
+	    overflow: hidden;
+	    background-color: grey;
+	}
+	.svg-content-responsive {
+	    display: inline-block;
+	    position: absolute;
+	    top: 10px;
+	    left: 0;
+	}
+	</style>
+
+</head>
+<body>
+
+
+	<script type="text/javascript">
+		//Width and height
+			var w = 1000;
+			var h = 600;
+			var padding = 120;
+			var timeConversion = 1000 * 60 * 60 * 24;
+			var category1 = {
+				label: "category1",
+				units: "(Units)",
+				data: []
+			};
+			var category2 = {
+				label: "category2",
+				units: "(Units)",
+				data: []
+			}
+			var category3 = {
+				label: "category3",
+				units: "(Units)",
+				data: []
+			}
+			var category4 = {
+				label: "category4",
+				units: "(Units)",
+				data: []
+			}
+			var category5 = {
+				label: "category5",
+				units: "(Units)",
+				data: []
+			}
+			var category6 = {
+				label: "category6",
+				units: "(Units)",
+				data: []
+			}
+			var category7 = {
+				label: "category7",
+				units: "(Units)",
+				data: []
+			}
+			var category8 = {
+				label: "category8",
+				units: "(Units)",
+				data: []
+			}
+			var category9 = {
+				label: "category9",
+				units: "(Units)",
+				data: []
+			}
+			var category10 = {
+				label: "category10",
+				units: "(Units)",
+				data: []
+			}
+			var category11 = {
+				label: "category11",
+				units: "(Units)",
+				data: []
+			}
+			var categories = [category1, category2 , category3, category4,category5, category6, category7, category8, category9, category10, category11];
+			var beginDate = new Date(2017,0, 20)
+			var amountOfDays = Math.floor(Math.random()*300)
+			for (var j = 0; j < categories.length; j ++) {
+				for (var i = 0; i < amountOfDays; i++) {
+					var increment = Math.floor(Math.random()*2); 
+					increment *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+					var next_num;
+					if (i > 0) {
+						next_num = Math.abs(categories[j].data[i - 1][1] + increment + .1);
+					}
+					else {
+						next_num = Math.floor(Math.random() * 5) + 5;
+					}
+					var entry = [d3.timeDay.offset(beginDate, i), next_num]
+					categories[j].data.push(entry);
+				}
+			}
+			//Create scale functions
+			var mindate = d3.min(categories[0].data, function(d) { return d[0];});
+            var maxdate = d3.max(categories[0].data, function(d) { return d[0];});
+        	var xScale = d3.scaleTime()
+	        	.domain([mindate,maxdate])
+				.range([padding, w - (padding * 2)]); 
+			var yScale = d3.scaleLinear()
+				.domain([d3.min(categories[0].data, function(d) { return d[1];}), d3.max(categories[0].data, function(d) { return d[1];})])
+				.range([h - padding, padding/2])
+			//Define axi?
+			var xAxis = d3.axisBottom()
+					.scale(xScale)
+					.ticks(8)
+			var yAxis = d3.axisLeft()
+				.scale(yScale)
+				.ticks(8)
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("div")
+   						.classed("svg-container", true)
+  						.append("svg")
+						.attr("preserveAspectRatio", "xMinYMin meet")
+   						.attr("viewBox", "0 0 "+ w +" "+ h +"")
+   						.classed("svg-content-responsive", true); 
+
+			//Create circles
+			svg.selectAll("circle")
+			   .data(categories[0].data)
+			   .enter()
+			   .append("circle")
+			   .attr("cx", function(d) {
+			   		return xScale(d[0]);
+			   })
+			   .attr("cy", function(d) {
+			   		return yScale(d[1]);
+			   })
+			   .attr("r", function(d) {
+			   		return (w/categories[0].data.length);
+			   })
+			   .attr("opacity", 0)
+			   ;
+			svg.append("text")
+				.attr("class", "yLabel")
+    			.attr("x", 12)
+    			.attr("y", h/2)
+    			.text(categories[0].label);
+    		svg.append("text")
+    			.attr("class", "yUnits")
+    			.attr("x", 12)
+    			.attr("y", h/2 + 20)
+    			.text(categories[0].units);
+    		svg.append("text")
+    			.attr("x", w/2 - padding/2)
+    			.attr("y", h - padding/2)
+    			.text("Time");
+			var line = d3.line()
+    			.x(function(d) { return xScale(d[0]); })
+    			.y(function(d) { return yScale(d[1]); });
+			svg.append('svg:path')
+				.attr("id", "line")
+  				.attr('d', line(categories[0].data))
+  				.attr('stroke', '#f27350')
+  				.attr('stroke-width', 2)
+  				.attr('fill', 'none');
+			svg.append("g")
+				.attr("class", "xaxis")
+			 	.attr("transform", "translate(0," + (h - padding) + ")")
+				.call(xAxis);
+			svg.append("g")
+				.attr("class", "yaxis")
+				.attr("transform", "translate("+ padding +", 0)")
+				.call(yAxis)
+			svg.selectAll(".xaxis text") 
+          		.attr("transform", function(d) {
+              		return "translate(" + this.getBBox().height*-2 + "," + this.getBBox().height + ")rotate(-45)";
+            })
+          	svg.append("text")
+            		.attr("class", "Click Me")
+    				.attr("x", (w * 4)/5)
+    				.attr("y", 70)
+    				.text("Click on Categories");
+            for (var j = 0; j < categories.length; j ++) {
+            	svg.append("text")
+            		.attr("class", ""+ categories[j].label +"")
+    				.attr("x", (w * 4)/5)
+    				.attr("y", 100 + 30*j)
+    				.text(""+ categories[j].label + "");
+           	}
+
+           	function UpdateGraph(category) {
+           		d3.select(".yLabel").remove()
+    			d3.select(".yUnits").remove()
+           		var yScale = d3.scaleLinear()
+					.domain([d3.min(categories[category].data, function(d) { return d[1];}), d3.max(categories[category].data, function(d) { return d[1];})])
+					.range([h - padding, padding/2])	
+          		svg.selectAll("circle")
+			   		.data(categories[category].data)
+			   		.attr("cy", function(d) {
+			   			return yScale(d[1]);
+			   		})
+				d3.select(".yaxis").remove();			
+				d3.select("#line").remove();
+				var yAxis = d3.axisLeft()
+					.scale(yScale)
+					.ticks(8)
+				svg.append("g")
+					.attr("class", "yaxis")
+					.attr("transform", "translate("+ padding +", 0)")
+					.call(yAxis)
+				var line = d3.line()
+    				.x(function(d) { return xScale(d[0]); })
+    				.y(function(d) { return yScale(d[1]); });
+    			svg.append('svg:path')
+    				.attr("id", "line")
+  					.attr('d', line(categories[category].data))
+  					.attr('stroke', '#f27350')
+  					.attr('stroke-width', 2)
+  					.attr('fill', 'none');  
+  				svg.append("text")
+  					.attr("class", "yLabel")
+    				.attr("x", 12)
+    				.attr("y", h/2)
+    				.text(categories[category].label);
+    			svg.append("text")
+    				.attr("class", "yUnits")
+    				.attr("x", 12)
+    				.attr("y", h/2 + 20)
+    				.text(categories[category].units);
+    			d3.selectAll("circle")
+         
+       
+			}
+			d3.select("."+ categories[0].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(0)})
+			d3.select("."+ categories[1].label + "")
+          		.on("click", function(d) {
+        			UpdateGraph(1)})
+          	d3.select("."+ categories[2].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(2)})
+          	d3.select("."+ categories[3].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(3)})
+          	d3.select("."+ categories[4].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(4)})
+          	d3.select("."+ categories[5].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(5)})
+          	d3.select("."+ categories[6].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(6)})
+          	d3.select("."+ categories[7].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(7)})
+          	d3.select("."+ categories[8].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(8)})
+          	d3.select("."+ categories[9].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(9)})
+          	d3.select("."+ categories[10].label + "")
+          		.on("click", function(d) {
+          			UpdateGraph(10)})
+          	
+
+	</script>
+
+</body>
+</html>
