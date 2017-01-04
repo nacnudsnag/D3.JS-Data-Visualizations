@@ -1,0 +1,83 @@
+nav.primary {
+	display: table;
+	margin: 0 auto;
+}
+
+nav.primary ul, nav.primary ul li {
+  margin: 0px;
+}
+
+nav.primary ul li {
+  display: inline;
+  position: relative;
+}
+
+nav.primary ul div {
+  display: inline;
+  position: relative;
+}
+
+nav.primary ul li a {
+  display: inline-block;
+  line-height: 49px;
+  padding:  0 14px;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  background: ##999999;
+}
+
+nav.primary ul li a:hover {
+  background: #2ecc71;
+  cursor: pointer;
+}
+
+#login ul {
+	visibility: hidden;
+	display: none;
+}
+
+#login li:hover>ul {
+	visibility: visible;
+	display: block;
+}
+
+#login ul {
+	position: absolute;
+}
+
+#login ul li {
+	position: relative;
+	float: none;
+}
+
+#login ul li a {
+  	line-height: 49px;
+  	padding:  15px 20px;
+  	text-transform: uppercase;
+  	text-decoration: none;
+  	font-weight: bold;
+  	letter-spacing: 0.08em;
+  	background: ##999999;
+}
+
+#about {
+	text-align: center;
+}
+
+.simple {
+	font-family: Helvetica;
+	color: #763626;
+}  
+#header {
+	background-color: #90afc5;
+	width: 140%;
+	height: 2.7em;
+	margin: -.6em;
+}
+.items {
+	font-family: Garamond;
+	font-size: 2em;
+	color: #763626;
+}

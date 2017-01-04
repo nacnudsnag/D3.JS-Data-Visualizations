@@ -46,7 +46,7 @@
                     return yScale(d);
                })
                .attr("fill", function(d) {
-                    return "rgb(0, 0, " + (d * 10) + ")";
+                    return "rgb(242, 115, "  + (-90 + (d * 10)) + ")";
                });
             //Create labels
             svg.selectAll("text")
@@ -65,7 +65,7 @@
                })
                .attr("font-family", "sans-serif")
                .attr("font-size", "11px")
-               .attr("fill", "white");
+               .attr("fill", "grey");
             d3.select("p")
                 .on("click", function() {
 
