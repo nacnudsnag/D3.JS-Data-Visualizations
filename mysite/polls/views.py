@@ -49,4 +49,5 @@ def LineGraph(request):
     return render(request, 'polls/LineGraph.html')
 def index(request):
     return HttpResponse("VisualizationPractice TEST PAGE")
-
+def ScatterPlot(request):
+    return render(request, 'polls/ScatterPlot.html')
