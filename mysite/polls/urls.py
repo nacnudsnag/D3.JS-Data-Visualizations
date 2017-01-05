@@ -12,5 +12,6 @@ urlpatterns = [
                url(r'^BarGraph/$', views.BarGraph, name='BarGraph'),
                url(r'^LineGraph/$', views.LineGraph, name='LineGraph'),
                url(r'^ScatterPlot/$', views.ScatterPlot, name='ScatterPlot'),
+               url(r'^Distribution/$', views.Distribution, name='Distribution'),
 ]
 

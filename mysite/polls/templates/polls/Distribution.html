@@ -1,0 +1,223 @@
+<!DOCTYPE html">
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Home</title>
+	<!-- CSS Style Sheets -->
+	{% load static %}
+	<link rel='stylesheet' type='text/css' href='{% static 'website/css/skeleton.css' %}'/>
+	<link rel='stylesheet' type='text/css' href='{% static 'website/css/custom.css' %}'/>
+	<!-- Adding d3.js -->
+	<script type="text/javascript" src="{% static 'website/d3/d3.js'%}"></script>
+	<style>
+	.svg-container {
+	    display: inline-block;
+	    position: relative;
+	    margin-left: -.6em;
+	    width: 105%;
+	    padding-bottom: 60%; /* aspect ratio */
+	    vertical-align: top;
+	    overflow: hidden;
+	    background-color: #90AFC5;
+	}
+	.svg-content-responsive {
+	    display: inline-block;
+	    position: absolute;
+	    top: 10px;
+	    left: 0;
+	}
+	</style>
+
+</head>
+<body>
+
+
+	<script type="text/javascript">
+		//Width and height
+			var w = 500;
+			var h = 200;
+			var padding = 20;
+			var timeConversion = 1000 * 60 * 60 * 24;
+			var meditation = {
+				label: "Meditation",
+				units: "(Minutes)",
+				data: []
+			};
+			var pushups = {
+				label: "Pushups",
+				units: "",
+				data: []
+			}
+			var productivityScore = {
+				label: "Productivity",
+				units: "(Score)",
+				data: []
+			}
+			var maxBench = {
+				label: "Bench",
+				units: "(Max)",
+				data: []
+			}
+			var bananasEaten = {
+				label: "bananas",
+				units: "(eaten)",
+				data: []
+			}
+			var milesRan = {
+				label: "Distance",
+				units: "(Miles)",
+				data: []
+			}
+			var pagesRead = {
+				label: "Read",
+				units: "(Pages)",
+				data: []
+			}
+			var LinesOfCodeWritten = {
+				label: "Code",
+				units: "(Lines)",
+				data: []
+			}
+			var nine = {
+				label: "nine",
+				units: "(Max)",
+				data: []
+			}
+			var ten = {
+				label: "ten",
+				units: "(Max)",
+				data: []
+			}
+			var eleven = {
+				label: "eleven",
+				units: "(Max)",
+				data: []
+			}
+			var categories = [productivityScore, meditation, pushups, maxBench,bananasEaten, milesRan, pagesRead, LinesOfCodeWritten, nine, ten, eleven];
+			var beginDate = new Date(2017,0, 20)
+			var amountOfDays = Math.floor(Math.random()*3000)
+			for (var j = 0; j < categories.length; j ++) {
+				for (var i = 0; i < amountOfDays; i++) {
+					var increment = Math.floor(Math.random()*2); 
+					increment *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+					var next_num;
+					if (i > 0) {
+						next_num = Math.abs(categories[j].data[i - 1][1] + increment);
+					}
+					else {
+						next_num = Math.floor(Math.random() * 5) + 5;
+					}
+					var entry = [d3.timeDay.offset(beginDate, i), next_num]
+					categories[j].data.push(entry);
+				}
+			}
+			function updateGraph(category) {
+			var min = d3.min(categories[category].data, function(d) { return d[1];})
+			var max = d3.max(categories[category].data, function(d) { return d[1];})
+			var numOfDivision;
+			var division = (Math.floor((max-min)/13) + 1)
+			var binomialDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+			var numsForScale = [];
+			for (var k = 0; k < 13; k++) {
+				numsForScale[k] = min + k * division
+			}
+			for (var i = 0; i < amountOfDays; i++) {
+				for (var j = 0; j < amountOfDays; j++) {
+					if (categories[category].data[i][1] < min + (division * (j + 1))) {
+						binomialDistribution[j] += 1;
+						break;
+					}
+				}
+			}
+			var yScaleForAxis = d3.scaleLinear()
+                            .domain([0, d3.max(binomialDistribution)])
+                            .range([h, 0]);
+            var xScaleForAxis = d3.scaleLinear()
+                            .domain([min, d3.max(numsForScale)])
+                            .range([0, w]);
+            var xScale = d3.scaleBand()
+                            .domain(d3.range(binomialDistribution.length))
+                            .range([padding * 2, w + padding * 2], 0.05);
+            var yScale = d3.scaleLinear()
+                            .domain([0, d3.max(binomialDistribution)])
+                            .range([0, h]);
+            var colorScale = d3.scaleLinear()
+                            .domain([0, d3.max(binomialDistribution)])
+                            .range([30, 200]);
+            //Create SVG element
+            var svg = d3.select("body")
+						.append("div")
+   						.classed("svg-container", true)
+  						.append("svg")
+						.attr("preserveAspectRatio", "xMinYMin meet")
+   						.attr("viewBox", "0 0 "+ (w + padding*4) +" "+ (h + padding*3) +"")
+   						.classed("svg-content-responsive", true); 
+
+            //Create bars
+            
+            svg.selectAll("rect")
+               .data(binomialDistribution)
+               .enter()
+               .append("rect")
+               .attr("x", function(d, i) {
+                    return xScale(i);
+               })
+               .attr("y", function(d) {
+                    return h - yScale(d) + padding * 2;
+               })
+               .attr("width", xScale.bandwidth())
+               .attr("height", function(d) {
+                    return yScale(d);
+               })
+               .attr("fill", function(d) {
+                    return "rgb(0, 0, "  +  Math.floor(colorScale(d))  + ")";
+            });
+            //Create labels
+            svg.selectAll("text")
+               .data(binomialDistribution)
+               .enter()
+               .append("text")
+               .text(function(d) {
+                    return d;
+               })
+               .attr("text-anchor", "middle")
+               .attr("x", function(d, i) {
+                    return xScale(i) + xScale.bandwidth() / 2;
+               })
+               .attr("y", function(d) {
+                    return h - yScale(d) + 14 + padding;
+               })
+               .attr("font-family", "sans-serif")
+               .attr("font-size", "11px")
+               .attr("fill", "grey");
+            var xAxis = d3.axisBottom()
+					.scale(xScaleForAxis)
+					.tickValues(numsForScale)
+			svg.append("g")
+				.attr("class", "xaxis")
+			 	.attr("transform", "translate("+ padding * 2 + "," + ((h + padding * 2)) + ")")
+				.call(xAxis);
+			var yAxis = d3.axisLeft()
+				.scale(yScaleForAxis)
+				.ticks(8)
+
+			svg.append("g")
+				.attr("class", "yaxis")
+				.attr("transform", "translate("+ padding * 2 +", "+ padding * 2+")")
+				.call(yAxis)
+			}
+			updateGraph(1)
+			var byMonth = [[], [], [], [], [], [], [], [], [], [], [], []]
+			for (var i = 0; i < amountOfDays; i++) {
+				var month = categories[0].data[i][0].getMonth();
+				byMonth[month].push(categories[0].data[i][1]);
+			}
+
+			
+
+           	
+
+	</script>
+
+</body>
+</html>

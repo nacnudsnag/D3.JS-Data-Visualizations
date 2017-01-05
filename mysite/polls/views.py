@@ -51,3 +51,6 @@ def index(request):
     return HttpResponse("VisualizationPractice TEST PAGE")
 def ScatterPlot(request):
     return render(request, 'polls/ScatterPlot.html')
+
+def Distribution(request):
+    return render(request, 'polls/Distribution.html')
